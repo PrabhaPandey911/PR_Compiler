@@ -1,0 +1,3804 @@
+Terminals unused in grammar
+
+   CLOSE_CLURLY_BRKT
+
+
+Grammar
+
+    0 $accept: Goal $end
+
+    1 Goal: import_ choose
+
+    2 choose: declist
+    3       | block
+    4       | stmtlist
+
+    5 import_: import_ '\n' IMPORT filename
+    6        | IMPORT filename
+    7        | %empty
+
+    8 filename: VARIABLE_NAME
+    9         | STRING_VALUE
+
+   10 declist: declist dec
+   11        | dec
+
+   12 dec: vardec
+   13    | fundec
+
+   14 vardec: vartype vardeclist SEMICOLON
+
+   15 vardeclist: vardeclist COMMA vardeclist
+   16           | varinit
+   17           | varinit EQ array
+   18           | varinit EQ expr
+
+   19 array: OPN_SQ_BRKT CLOSE_SQ_BRKT
+   20      | OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+   21      | OPN_CURLY_BRKT OPN_CURLY_BRKT element CLOSE_CURLY_BRKT CLOSE_CURLY_BRKT
+
+   22 element: values
+   23        | VARIABLE_NAME
+   24        | element COMMA values
+   25        | OPN_CURLY_BRKT element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+   26        | %empty
+
+   27 values: SIGNED_INT_VALUE
+   28       | UNSIGNED_INT_VALUE
+   29       | boolval
+   30       | CHAR_VALUE
+   31       | STRING_VALUE
+
+   32 boolval: TRUE
+   33        | FALSE
+
+   34 varinit: VARIABLE_NAME
+   35        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT
+   36        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+   37        | VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   38        | VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   40        | VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   41        | VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+   43 vartype: UNSIGNED_INT
+   44        | UNSIGNED_LONG
+   45        | INT
+   46        | BOOL
+   47        | CHAR
+   48        | LONG
+   49        | STRING
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+   51               | FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+   52 fundec: vartype VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block
+   53       | return_type VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block
+
+   54 return_type: VOID
+   55            | vartype OPN_SQ_BRKT CLOSE_SQ_BRKT
+   56            | vartype OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+
+   57 params: paramlist
+
+   58 paramlist: arg_type COMMA paramlist
+   59          | arg_type
+   60          | %empty
+
+   61 arg_type: vartype VARIABLE_NAME
+   62         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT
+   63         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+   65 block: OPN_CURLY_BRKT blockstmts
+
+   66 blockstmts: CLOSE_CURLY_BRKT
+   67           | declist stmtlist CLOSE_CURLY_BRKT
+   68           | stmtlist CLOSE_CURLY_BRKT
+
+   69 continuestmt: CONTINUE
+
+   70 stmt: exprstmt
+   71     | file_operation
+   72     | loopstmt
+   73     | selectstmt
+   74     | breakstmt
+   75     | continuestmt
+   76     | returnstmt
+
+   77 returnstmt: RETURN exprstmt
+
+   78 stmtlist: stmtlist stmt
+   79         | stmt
+
+   80 exprstmt: expr SEMICOLON
+   81         | SEMICOLON
+
+   82 selectstmt: IF OPN_BRKT expr CLOSE_BRKT block ELSE block
+   83           | IF OPN_BRKT expr CLOSE_BRKT block else_if
+   84           | IF OPN_BRKT expr CLOSE_BRKT block
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT block else_if ELSE block
+   86        | ELSEIF OPN_BRKT expr CLOSE_BRKT block
+
+   87 loopstmt: WHILE OPN_BRKT expr CLOSE_BRKT block
+   88         | FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON CLOSE_BRKT block
+
+   90 assign_expr: varinit EQ expr
+   91            | vartype varinit EQ expr
+   92            | %empty
+
+   93 inc_or_dec_expr: flw_term EQ expr
+   94                | flw_term PLUS_EQ expr
+   95                | flw_term MINUS_EQ expr
+   96                | flw_term MULTIPLY_EQ expr
+   97                | flw_term DIVIDE_EQ expr
+   98                | flw_term MODULO_EQ expr
+   99                | POSTINC
+  100                | POSTDEC
+  101                | PREINC
+  102                | PREDEC
+
+  103 breakstmt: BREAK SEMICOLON
+
+  104 expr: inc_or_dec_expr
+  105     | simple_expr
+  106     | expr QUESTION_MARK expr COLON expr
+
+  107 simple_expr: simple_expr OR and_expr
+  108            | and_expr
+
+  109 and_expr: and_expr AND not_expr
+  110         | not_expr
+
+  111 not_expr: NOT not_expr
+  112         | rel_expr
+
+  113 rel_expr: sum_expr relop sum_expr
+  114         | sum_expr
+
+  115 relop: LTEQ
+  116      | LT
+  117      | GT
+  118      | GTEQ
+  119      | DBL_EQ
+  120      | NOT_EQ
+
+  121 sum_expr: sum_expr sumop term
+  122         | term
+
+  123 sumop: PLUS
+  124      | MINUS
+
+  125 term: term mulop flw_term
+  126     | flw_term
+
+  127 mulop: MULTIPLY
+  128      | DIVIDE
+  129      | MODULO
+
+  130 flw_term: values
+  131         | VARIABLE_NAME
+  132         | VARIABLE_NAME OPN_BRKT CLOSE_BRKT
+  133         | VARIABLE_NAME after_ID
+  134         | OPN_BRKT expr CLOSE_BRKT
+
+  135 after_ID: OPN_SQ_BRKT expr CLOSE_SQ_BRKT follow
+  136         | OPN_BRKT args CLOSE_BRKT
+
+  137 follow: OPN_SQ_BRKT expr CLOSE_SQ_BRKT
+  138       | %empty
+
+  139 args: args COMMA expr
+  140     | expr
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'\n' (10) 5
+error (256)
+UNSIGNED_INT (258) 43
+UNSIGNED_LONG (259) 44
+INT (260) 45
+BOOL (261) 46
+CHAR (262) 47
+LONG (263) 48
+STRING (264) 49
+RETURN (265) 77
+BREAK (266) 103
+READ (267) 50
+WRITE (268) 51
+CLOSE (269) 50 51
+CONTINUE (270) 69
+FOR (271) 88 89
+WHILE (272) 87
+IF (273) 82 83 84
+ELSE (274) 82 85
+ELSEIF (275) 85 86
+VOID (276) 54
+TRUE (277) 32
+FALSE (278) 33
+UNSIGNED_INT_VALUE (279) 28 40 41 42 64
+SIGNED_INT_VALUE (280) 27
+CHAR_VALUE (281) 30
+STRING_VALUE (282) 9 31
+VARIABLE_NAME (283) 8 23 34 35 36 37 38 39 40 41 42 50 52 53 61 62
+    63 64 131 132 133
+IMPORT (284) 5 6
+QUESTION_MARK (285) 106
+COLON (286) 106
+COMMA (287) 15 24 25 58 139
+OPN_BRKT (288) 50 51 52 53 82 83 84 85 86 87 88 89 132 134 136
+CLOSE_BRKT (289) 50 51 52 53 82 83 84 85 86 87 88 89 132 134 136
+OPN_SQ_BRKT (290) 19 35 36 37 38 39 40 41 42 55 56 62 63 64 135 137
+CLOSE_SQ_BRKT (291) 19 35 36 37 38 39 40 41 42 55 56 62 63 64 135 137
+OPN_CURLY_BRKT (292) 20 21 25 65
+CLOSE_CURLY_BRKT (293) 20 21 25 66 67 68
+SEMICOLON (294) 14 50 51 80 81 88 89 103
+FILEREAD (295) 50
+FILEWRITE (296) 51
+LTEQ (297) 115
+GTEQ (298) 118
+LT (299) 116
+GT (300) 117
+DBL_EQ (301) 119
+PLUS_EQ (302) 94
+MINUS_EQ (303) 95
+MULTIPLY_EQ (304) 96
+DIVIDE_EQ (305) 97
+MODULO_EQ (306) 98
+PREINC (307) 101
+POSTINC (308) 99
+PREDEC (309) 102
+POSTDEC (310) 100
+PLUS (311) 123
+MINUS (312) 124
+MULTIPLY (313) 127
+DIVIDE (314) 128
+MODULO (315) 129
+NOT_EQ (316) 120
+EQ (317) 17 18 50 90 91 93
+NOT (318) 111
+OR (319) 107
+AND (320) 109
+CLOSE_CLURLY_BRKT (321)
+
+
+Nonterminals, with rules where they appear
+
+$accept (68)
+    on left: 0
+Goal (69)
+    on left: 1, on right: 0
+choose (70)
+    on left: 2 3 4, on right: 1
+import_ (71)
+    on left: 5 6 7, on right: 1 5
+filename (72)
+    on left: 8 9, on right: 5 6 50 51
+declist (73)
+    on left: 10 11, on right: 2 10 67
+dec (74)
+    on left: 12 13, on right: 10 11
+vardec (75)
+    on left: 14, on right: 12
+vardeclist (76)
+    on left: 15 16 17 18, on right: 14 15
+array (77)
+    on left: 19 20 21, on right: 17
+element (78)
+    on left: 22 23 24 25 26, on right: 20 21 24 25
+values (79)
+    on left: 27 28 29 30 31, on right: 22 24 130
+boolval (80)
+    on left: 32 33, on right: 29
+varinit (81)
+    on left: 34 35 36 37 38 39 40 41 42, on right: 16 17 18 90 91
+vartype (82)
+    on left: 43 44 45 46 47 48 49, on right: 14 52 55 56 61 62 63 64
+    91
+file_operation (83)
+    on left: 50 51, on right: 71
+fundec (84)
+    on left: 52 53, on right: 13
+return_type (85)
+    on left: 54 55 56, on right: 53
+params (86)
+    on left: 57, on right: 52 53
+paramlist (87)
+    on left: 58 59 60, on right: 57 58
+arg_type (88)
+    on left: 61 62 63 64, on right: 58 59
+block (89)
+    on left: 65, on right: 3 52 53 82 83 84 85 86 87 88 89
+blockstmts (90)
+    on left: 66 67 68, on right: 65
+continuestmt (91)
+    on left: 69, on right: 75
+stmt (92)
+    on left: 70 71 72 73 74 75 76, on right: 78 79
+returnstmt (93)
+    on left: 77, on right: 76
+stmtlist (94)
+    on left: 78 79, on right: 4 50 51 67 68 78
+exprstmt (95)
+    on left: 80 81, on right: 70 77
+selectstmt (96)
+    on left: 82 83 84, on right: 73
+else_if (97)
+    on left: 85 86, on right: 83 85
+loopstmt (98)
+    on left: 87 88 89, on right: 72
+assign_expr (99)
+    on left: 90 91 92, on right: 88 89
+inc_or_dec_expr (100)
+    on left: 93 94 95 96 97 98 99 100 101 102, on right: 88 104
+breakstmt (101)
+    on left: 103, on right: 74
+expr (102)
+    on left: 104 105 106, on right: 18 80 82 83 84 85 86 87 88 89 90
+    91 93 94 95 96 97 98 106 134 135 137 139 140
+simple_expr (103)
+    on left: 107 108, on right: 105 107
+and_expr (104)
+    on left: 109 110, on right: 107 108 109
+not_expr (105)
+    on left: 111 112, on right: 109 110 111
+rel_expr (106)
+    on left: 113 114, on right: 112
+relop (107)
+    on left: 115 116 117 118 119 120, on right: 113
+sum_expr (108)
+    on left: 121 122, on right: 113 114 121
+sumop (109)
+    on left: 123 124, on right: 121
+term (110)
+    on left: 125 126, on right: 121 122 125
+mulop (111)
+    on left: 127 128 129, on right: 125
+flw_term (112)
+    on left: 130 131 132 133 134, on right: 93 94 95 96 97 98 125 126
+after_ID (113)
+    on left: 135 136, on right: 133
+follow (114)
+    on left: 137 138, on right: 135
+args (115)
+    on left: 139 140, on right: 136 139
+
+
+State 0
+
+    0 $accept: . Goal $end
+
+    IMPORT  shift, and go to state 1
+
+    $default  reduce using rule 7 (import_)
+
+    Goal     go to state 2
+    import_  go to state 3
+
+
+State 1
+
+    6 import_: IMPORT . filename
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 6
+
+
+State 2
+
+    0 $accept: Goal . $end
+
+    $end  shift, and go to state 7
+
+
+State 3
+
+    1 Goal: import_ . choose
+    5 import_: import_ . '\n' IMPORT filename
+
+    UNSIGNED_INT        shift, and go to state 8
+    UNSIGNED_LONG       shift, and go to state 9
+    INT                 shift, and go to state 10
+    BOOL                shift, and go to state 11
+    CHAR                shift, and go to state 12
+    LONG                shift, and go to state 13
+    STRING              shift, and go to state 14
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    VOID                shift, and go to state 21
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    OPN_CURLY_BRKT      shift, and go to state 30
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+    '\n'                shift, and go to state 39
+
+    choose           go to state 40
+    declist          go to state 41
+    dec              go to state 42
+    vardec           go to state 43
+    values           go to state 44
+    boolval          go to state 45
+    vartype          go to state 46
+    file_operation   go to state 47
+    fundec           go to state 48
+    return_type      go to state 49
+    block            go to state 50
+    continuestmt     go to state 51
+    stmt             go to state 52
+    returnstmt       go to state 53
+    stmtlist         go to state 54
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 4
+
+    9 filename: STRING_VALUE .
+
+    $default  reduce using rule 9 (filename)
+
+
+State 5
+
+    8 filename: VARIABLE_NAME .
+
+    $default  reduce using rule 8 (filename)
+
+
+State 6
+
+    6 import_: IMPORT filename .
+
+    $default  reduce using rule 6 (import_)
+
+
+State 7
+
+    0 $accept: Goal $end .
+
+    $default  accept
+
+
+State 8
+
+   43 vartype: UNSIGNED_INT .
+
+    $default  reduce using rule 43 (vartype)
+
+
+State 9
+
+   44 vartype: UNSIGNED_LONG .
+
+    $default  reduce using rule 44 (vartype)
+
+
+State 10
+
+   45 vartype: INT .
+
+    $default  reduce using rule 45 (vartype)
+
+
+State 11
+
+   46 vartype: BOOL .
+
+    $default  reduce using rule 46 (vartype)
+
+
+State 12
+
+   47 vartype: CHAR .
+
+    $default  reduce using rule 47 (vartype)
+
+
+State 13
+
+   48 vartype: LONG .
+
+    $default  reduce using rule 48 (vartype)
+
+
+State 14
+
+   49 vartype: STRING .
+
+    $default  reduce using rule 49 (vartype)
+
+
+State 15
+
+   77 returnstmt: RETURN . exprstmt
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    exprstmt         go to state 68
+    inc_or_dec_expr  go to state 58
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 16
+
+  103 breakstmt: BREAK . SEMICOLON
+
+    SEMICOLON  shift, and go to state 69
+
+
+State 17
+
+   69 continuestmt: CONTINUE .
+
+    $default  reduce using rule 69 (continuestmt)
+
+
+State 18
+
+   88 loopstmt: FOR . OPN_BRKT assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR . OPN_BRKT assign_expr SEMICOLON expr SEMICOLON CLOSE_BRKT block
+
+    OPN_BRKT  shift, and go to state 70
+
+
+State 19
+
+   87 loopstmt: WHILE . OPN_BRKT expr CLOSE_BRKT block
+
+    OPN_BRKT  shift, and go to state 71
+
+
+State 20
+
+   82 selectstmt: IF . OPN_BRKT expr CLOSE_BRKT block ELSE block
+   83           | IF . OPN_BRKT expr CLOSE_BRKT block else_if
+   84           | IF . OPN_BRKT expr CLOSE_BRKT block
+
+    OPN_BRKT  shift, and go to state 72
+
+
+State 21
+
+   54 return_type: VOID .
+
+    $default  reduce using rule 54 (return_type)
+
+
+State 22
+
+   32 boolval: TRUE .
+
+    $default  reduce using rule 32 (boolval)
+
+
+State 23
+
+   33 boolval: FALSE .
+
+    $default  reduce using rule 33 (boolval)
+
+
+State 24
+
+   28 values: UNSIGNED_INT_VALUE .
+
+    $default  reduce using rule 28 (values)
+
+
+State 25
+
+   27 values: SIGNED_INT_VALUE .
+
+    $default  reduce using rule 27 (values)
+
+
+State 26
+
+   30 values: CHAR_VALUE .
+
+    $default  reduce using rule 30 (values)
+
+
+State 27
+
+   31 values: STRING_VALUE .
+
+    $default  reduce using rule 31 (values)
+
+
+State 28
+
+  131 flw_term: VARIABLE_NAME .
+  132         | VARIABLE_NAME . OPN_BRKT CLOSE_BRKT
+  133         | VARIABLE_NAME . after_ID
+
+    OPN_BRKT     shift, and go to state 73
+    OPN_SQ_BRKT  shift, and go to state 74
+
+    $default  reduce using rule 131 (flw_term)
+
+    after_ID  go to state 75
+
+
+State 29
+
+  134 flw_term: OPN_BRKT . expr CLOSE_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 76
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 30
+
+   65 block: OPN_CURLY_BRKT . blockstmts
+
+    UNSIGNED_INT        shift, and go to state 8
+    UNSIGNED_LONG       shift, and go to state 9
+    INT                 shift, and go to state 10
+    BOOL                shift, and go to state 11
+    CHAR                shift, and go to state 12
+    LONG                shift, and go to state 13
+    STRING              shift, and go to state 14
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    VOID                shift, and go to state 21
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    CLOSE_CURLY_BRKT    shift, and go to state 77
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    declist          go to state 78
+    dec              go to state 42
+    vardec           go to state 43
+    values           go to state 44
+    boolval          go to state 45
+    vartype          go to state 46
+    file_operation   go to state 47
+    fundec           go to state 48
+    return_type      go to state 49
+    blockstmts       go to state 79
+    continuestmt     go to state 51
+    stmt             go to state 52
+    returnstmt       go to state 53
+    stmtlist         go to state 80
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 31
+
+   81 exprstmt: SEMICOLON .
+
+    $default  reduce using rule 81 (exprstmt)
+
+
+State 32
+
+   50 file_operation: FILEREAD . VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    VARIABLE_NAME  shift, and go to state 81
+
+
+State 33
+
+   51 file_operation: FILEWRITE . WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    WRITE  shift, and go to state 82
+
+
+State 34
+
+  101 inc_or_dec_expr: PREINC .
+
+    $default  reduce using rule 101 (inc_or_dec_expr)
+
+
+State 35
+
+   99 inc_or_dec_expr: POSTINC .
+
+    $default  reduce using rule 99 (inc_or_dec_expr)
+
+
+State 36
+
+  102 inc_or_dec_expr: PREDEC .
+
+    $default  reduce using rule 102 (inc_or_dec_expr)
+
+
+State 37
+
+  100 inc_or_dec_expr: POSTDEC .
+
+    $default  reduce using rule 100 (inc_or_dec_expr)
+
+
+State 38
+
+  111 not_expr: NOT . not_expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    NOT                 shift, and go to state 38
+
+    values    go to state 44
+    boolval   go to state 45
+    not_expr  go to state 83
+    rel_expr  go to state 64
+    sum_expr  go to state 65
+    term      go to state 66
+    flw_term  go to state 84
+
+
+State 39
+
+    5 import_: import_ '\n' . IMPORT filename
+
+    IMPORT  shift, and go to state 85
+
+
+State 40
+
+    1 Goal: import_ choose .
+
+    $default  reduce using rule 1 (Goal)
+
+
+State 41
+
+    2 choose: declist .
+   10 declist: declist . dec
+
+    UNSIGNED_INT   shift, and go to state 8
+    UNSIGNED_LONG  shift, and go to state 9
+    INT            shift, and go to state 10
+    BOOL           shift, and go to state 11
+    CHAR           shift, and go to state 12
+    LONG           shift, and go to state 13
+    STRING         shift, and go to state 14
+    VOID           shift, and go to state 21
+
+    $default  reduce using rule 2 (choose)
+
+    dec          go to state 86
+    vardec       go to state 43
+    vartype      go to state 46
+    fundec       go to state 48
+    return_type  go to state 49
+
+
+State 42
+
+   11 declist: dec .
+
+    $default  reduce using rule 11 (declist)
+
+
+State 43
+
+   12 dec: vardec .
+
+    $default  reduce using rule 12 (dec)
+
+
+State 44
+
+  130 flw_term: values .
+
+    $default  reduce using rule 130 (flw_term)
+
+
+State 45
+
+   29 values: boolval .
+
+    $default  reduce using rule 29 (values)
+
+
+State 46
+
+   14 vardec: vartype . vardeclist SEMICOLON
+   52 fundec: vartype . VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block
+   55 return_type: vartype . OPN_SQ_BRKT CLOSE_SQ_BRKT
+   56            | vartype . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+
+    VARIABLE_NAME  shift, and go to state 87
+    OPN_SQ_BRKT    shift, and go to state 88
+
+    vardeclist  go to state 89
+    varinit     go to state 90
+
+
+State 47
+
+   71 stmt: file_operation .
+
+    $default  reduce using rule 71 (stmt)
+
+
+State 48
+
+   13 dec: fundec .
+
+    $default  reduce using rule 13 (dec)
+
+
+State 49
+
+   53 fundec: return_type . VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block
+
+    VARIABLE_NAME  shift, and go to state 91
+
+
+State 50
+
+    3 choose: block .
+
+    $default  reduce using rule 3 (choose)
+
+
+State 51
+
+   75 stmt: continuestmt .
+
+    $default  reduce using rule 75 (stmt)
+
+
+State 52
+
+   79 stmtlist: stmt .
+
+    $default  reduce using rule 79 (stmtlist)
+
+
+State 53
+
+   76 stmt: returnstmt .
+
+    $default  reduce using rule 76 (stmt)
+
+
+State 54
+
+    4 choose: stmtlist .
+   78 stmtlist: stmtlist . stmt
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    $default  reduce using rule 4 (choose)
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 92
+    returnstmt       go to state 53
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 55
+
+   70 stmt: exprstmt .
+
+    $default  reduce using rule 70 (stmt)
+
+
+State 56
+
+   73 stmt: selectstmt .
+
+    $default  reduce using rule 73 (stmt)
+
+
+State 57
+
+   72 stmt: loopstmt .
+
+    $default  reduce using rule 72 (stmt)
+
+
+State 58
+
+  104 expr: inc_or_dec_expr .
+
+    $default  reduce using rule 104 (expr)
+
+
+State 59
+
+   74 stmt: breakstmt .
+
+    $default  reduce using rule 74 (stmt)
+
+
+State 60
+
+   80 exprstmt: expr . SEMICOLON
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    SEMICOLON      shift, and go to state 94
+
+
+State 61
+
+  105 expr: simple_expr .
+  107 simple_expr: simple_expr . OR and_expr
+
+    OR  shift, and go to state 95
+
+    $default  reduce using rule 105 (expr)
+
+
+State 62
+
+  108 simple_expr: and_expr .
+  109 and_expr: and_expr . AND not_expr
+
+    AND  shift, and go to state 96
+
+    $default  reduce using rule 108 (simple_expr)
+
+
+State 63
+
+  110 and_expr: not_expr .
+
+    $default  reduce using rule 110 (and_expr)
+
+
+State 64
+
+  112 not_expr: rel_expr .
+
+    $default  reduce using rule 112 (not_expr)
+
+
+State 65
+
+  113 rel_expr: sum_expr . relop sum_expr
+  114         | sum_expr .
+  121 sum_expr: sum_expr . sumop term
+
+    LTEQ    shift, and go to state 97
+    GTEQ    shift, and go to state 98
+    LT      shift, and go to state 99
+    GT      shift, and go to state 100
+    DBL_EQ  shift, and go to state 101
+    PLUS    shift, and go to state 102
+    MINUS   shift, and go to state 103
+    NOT_EQ  shift, and go to state 104
+
+    $default  reduce using rule 114 (rel_expr)
+
+    relop  go to state 105
+    sumop  go to state 106
+
+
+State 66
+
+  122 sum_expr: term .
+  125 term: term . mulop flw_term
+
+    MULTIPLY  shift, and go to state 107
+    DIVIDE    shift, and go to state 108
+    MODULO    shift, and go to state 109
+
+    $default  reduce using rule 122 (sum_expr)
+
+    mulop  go to state 110
+
+
+State 67
+
+   93 inc_or_dec_expr: flw_term . EQ expr
+   94                | flw_term . PLUS_EQ expr
+   95                | flw_term . MINUS_EQ expr
+   96                | flw_term . MULTIPLY_EQ expr
+   97                | flw_term . DIVIDE_EQ expr
+   98                | flw_term . MODULO_EQ expr
+  126 term: flw_term .
+
+    PLUS_EQ      shift, and go to state 111
+    MINUS_EQ     shift, and go to state 112
+    MULTIPLY_EQ  shift, and go to state 113
+    DIVIDE_EQ    shift, and go to state 114
+    MODULO_EQ    shift, and go to state 115
+    EQ           shift, and go to state 116
+
+    $default  reduce using rule 126 (term)
+
+
+State 68
+
+   77 returnstmt: RETURN exprstmt .
+
+    $default  reduce using rule 77 (returnstmt)
+
+
+State 69
+
+  103 breakstmt: BREAK SEMICOLON .
+
+    $default  reduce using rule 103 (breakstmt)
+
+
+State 70
+
+   88 loopstmt: FOR OPN_BRKT . assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT . assign_expr SEMICOLON expr SEMICOLON CLOSE_BRKT block
+
+    UNSIGNED_INT   shift, and go to state 8
+    UNSIGNED_LONG  shift, and go to state 9
+    INT            shift, and go to state 10
+    BOOL           shift, and go to state 11
+    CHAR           shift, and go to state 12
+    LONG           shift, and go to state 13
+    STRING         shift, and go to state 14
+    VARIABLE_NAME  shift, and go to state 117
+
+    $default  reduce using rule 92 (assign_expr)
+
+    varinit      go to state 118
+    vartype      go to state 119
+    assign_expr  go to state 120
+
+
+State 71
+
+   87 loopstmt: WHILE OPN_BRKT . expr CLOSE_BRKT block
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 121
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 72
+
+   82 selectstmt: IF OPN_BRKT . expr CLOSE_BRKT block ELSE block
+   83           | IF OPN_BRKT . expr CLOSE_BRKT block else_if
+   84           | IF OPN_BRKT . expr CLOSE_BRKT block
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 122
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 73
+
+  132 flw_term: VARIABLE_NAME OPN_BRKT . CLOSE_BRKT
+  136 after_ID: OPN_BRKT . args CLOSE_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    CLOSE_BRKT          shift, and go to state 123
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 124
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+    args             go to state 125
+
+
+State 74
+
+  135 after_ID: OPN_SQ_BRKT . expr CLOSE_SQ_BRKT follow
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 126
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 75
+
+  133 flw_term: VARIABLE_NAME after_ID .
+
+    $default  reduce using rule 133 (flw_term)
+
+
+State 76
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  134 flw_term: OPN_BRKT expr . CLOSE_BRKT
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_BRKT     shift, and go to state 127
+
+
+State 77
+
+   66 blockstmts: CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 66 (blockstmts)
+
+
+State 78
+
+   10 declist: declist . dec
+   67 blockstmts: declist . stmtlist CLOSE_CURLY_BRKT
+
+    UNSIGNED_INT        shift, and go to state 8
+    UNSIGNED_LONG       shift, and go to state 9
+    INT                 shift, and go to state 10
+    BOOL                shift, and go to state 11
+    CHAR                shift, and go to state 12
+    LONG                shift, and go to state 13
+    STRING              shift, and go to state 14
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    VOID                shift, and go to state 21
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    dec              go to state 86
+    vardec           go to state 43
+    values           go to state 44
+    boolval          go to state 45
+    vartype          go to state 46
+    file_operation   go to state 47
+    fundec           go to state 48
+    return_type      go to state 49
+    continuestmt     go to state 51
+    stmt             go to state 52
+    returnstmt       go to state 53
+    stmtlist         go to state 128
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 79
+
+   65 block: OPN_CURLY_BRKT blockstmts .
+
+    $default  reduce using rule 65 (block)
+
+
+State 80
+
+   68 blockstmts: stmtlist . CLOSE_CURLY_BRKT
+   78 stmtlist: stmtlist . stmt
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    CLOSE_CURLY_BRKT    shift, and go to state 129
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 92
+    returnstmt       go to state 53
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 81
+
+   50 file_operation: FILEREAD VARIABLE_NAME . EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    EQ  shift, and go to state 130
+
+
+State 82
+
+   51 file_operation: FILEWRITE WRITE . OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    OPN_BRKT  shift, and go to state 131
+
+
+State 83
+
+  111 not_expr: NOT not_expr .
+
+    $default  reduce using rule 111 (not_expr)
+
+
+State 84
+
+  126 term: flw_term .
+
+    $default  reduce using rule 126 (term)
+
+
+State 85
+
+    5 import_: import_ '\n' IMPORT . filename
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 132
+
+
+State 86
+
+   10 declist: declist dec .
+
+    $default  reduce using rule 10 (declist)
+
+
+State 87
+
+   34 varinit: VARIABLE_NAME .
+   35        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT
+   36        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+   37        | VARIABLE_NAME . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   38        | VARIABLE_NAME . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   40        | VARIABLE_NAME . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   41        | VARIABLE_NAME . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   52 fundec: vartype VARIABLE_NAME . OPN_BRKT params CLOSE_BRKT block
+
+    OPN_BRKT     shift, and go to state 133
+    OPN_SQ_BRKT  shift, and go to state 134
+
+    $default  reduce using rule 34 (varinit)
+
+
+State 88
+
+   55 return_type: vartype OPN_SQ_BRKT . CLOSE_SQ_BRKT
+   56            | vartype OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 135
+
+
+State 89
+
+   14 vardec: vartype vardeclist . SEMICOLON
+   15 vardeclist: vardeclist . COMMA vardeclist
+
+    COMMA      shift, and go to state 136
+    SEMICOLON  shift, and go to state 137
+
+
+State 90
+
+   16 vardeclist: varinit .
+   17           | varinit . EQ array
+   18           | varinit . EQ expr
+
+    EQ  shift, and go to state 138
+
+    $default  reduce using rule 16 (vardeclist)
+
+
+State 91
+
+   53 fundec: return_type VARIABLE_NAME . OPN_BRKT params CLOSE_BRKT block
+
+    OPN_BRKT  shift, and go to state 139
+
+
+State 92
+
+   78 stmtlist: stmtlist stmt .
+
+    $default  reduce using rule 78 (stmtlist)
+
+
+State 93
+
+  106 expr: expr QUESTION_MARK . expr COLON expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 140
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 94
+
+   80 exprstmt: expr SEMICOLON .
+
+    $default  reduce using rule 80 (exprstmt)
+
+
+State 95
+
+  107 simple_expr: simple_expr OR . and_expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    NOT                 shift, and go to state 38
+
+    values    go to state 44
+    boolval   go to state 45
+    and_expr  go to state 141
+    not_expr  go to state 63
+    rel_expr  go to state 64
+    sum_expr  go to state 65
+    term      go to state 66
+    flw_term  go to state 84
+
+
+State 96
+
+  109 and_expr: and_expr AND . not_expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    NOT                 shift, and go to state 38
+
+    values    go to state 44
+    boolval   go to state 45
+    not_expr  go to state 142
+    rel_expr  go to state 64
+    sum_expr  go to state 65
+    term      go to state 66
+    flw_term  go to state 84
+
+
+State 97
+
+  115 relop: LTEQ .
+
+    $default  reduce using rule 115 (relop)
+
+
+State 98
+
+  118 relop: GTEQ .
+
+    $default  reduce using rule 118 (relop)
+
+
+State 99
+
+  116 relop: LT .
+
+    $default  reduce using rule 116 (relop)
+
+
+State 100
+
+  117 relop: GT .
+
+    $default  reduce using rule 117 (relop)
+
+
+State 101
+
+  119 relop: DBL_EQ .
+
+    $default  reduce using rule 119 (relop)
+
+
+State 102
+
+  123 sumop: PLUS .
+
+    $default  reduce using rule 123 (sumop)
+
+
+State 103
+
+  124 sumop: MINUS .
+
+    $default  reduce using rule 124 (sumop)
+
+
+State 104
+
+  120 relop: NOT_EQ .
+
+    $default  reduce using rule 120 (relop)
+
+
+State 105
+
+  113 rel_expr: sum_expr relop . sum_expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+
+    values    go to state 44
+    boolval   go to state 45
+    sum_expr  go to state 143
+    term      go to state 66
+    flw_term  go to state 84
+
+
+State 106
+
+  121 sum_expr: sum_expr sumop . term
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+
+    values    go to state 44
+    boolval   go to state 45
+    term      go to state 144
+    flw_term  go to state 84
+
+
+State 107
+
+  127 mulop: MULTIPLY .
+
+    $default  reduce using rule 127 (mulop)
+
+
+State 108
+
+  128 mulop: DIVIDE .
+
+    $default  reduce using rule 128 (mulop)
+
+
+State 109
+
+  129 mulop: MODULO .
+
+    $default  reduce using rule 129 (mulop)
+
+
+State 110
+
+  125 term: term mulop . flw_term
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+
+    values    go to state 44
+    boolval   go to state 45
+    flw_term  go to state 145
+
+
+State 111
+
+   94 inc_or_dec_expr: flw_term PLUS_EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 146
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 112
+
+   95 inc_or_dec_expr: flw_term MINUS_EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 147
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 113
+
+   96 inc_or_dec_expr: flw_term MULTIPLY_EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 148
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 114
+
+   97 inc_or_dec_expr: flw_term DIVIDE_EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 149
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 115
+
+   98 inc_or_dec_expr: flw_term MODULO_EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 150
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 116
+
+   93 inc_or_dec_expr: flw_term EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 151
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 117
+
+   34 varinit: VARIABLE_NAME .
+   35        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT
+   36        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+   37        | VARIABLE_NAME . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   38        | VARIABLE_NAME . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   40        | VARIABLE_NAME . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   41        | VARIABLE_NAME . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 134
+
+    $default  reduce using rule 34 (varinit)
+
+
+State 118
+
+   90 assign_expr: varinit . EQ expr
+
+    EQ  shift, and go to state 152
+
+
+State 119
+
+   91 assign_expr: vartype . varinit EQ expr
+
+    VARIABLE_NAME  shift, and go to state 117
+
+    varinit  go to state 153
+
+
+State 120
+
+   88 loopstmt: FOR OPN_BRKT assign_expr . SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT assign_expr . SEMICOLON expr SEMICOLON CLOSE_BRKT block
+
+    SEMICOLON  shift, and go to state 154
+
+
+State 121
+
+   87 loopstmt: WHILE OPN_BRKT expr . CLOSE_BRKT block
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_BRKT     shift, and go to state 155
+
+
+State 122
+
+   82 selectstmt: IF OPN_BRKT expr . CLOSE_BRKT block ELSE block
+   83           | IF OPN_BRKT expr . CLOSE_BRKT block else_if
+   84           | IF OPN_BRKT expr . CLOSE_BRKT block
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_BRKT     shift, and go to state 156
+
+
+State 123
+
+  132 flw_term: VARIABLE_NAME OPN_BRKT CLOSE_BRKT .
+
+    $default  reduce using rule 132 (flw_term)
+
+
+State 124
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  140 args: expr .
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 140 (args)
+
+
+State 125
+
+  136 after_ID: OPN_BRKT args . CLOSE_BRKT
+  139 args: args . COMMA expr
+
+    COMMA       shift, and go to state 157
+    CLOSE_BRKT  shift, and go to state 158
+
+
+State 126
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  135 after_ID: OPN_SQ_BRKT expr . CLOSE_SQ_BRKT follow
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_SQ_BRKT  shift, and go to state 159
+
+
+State 127
+
+  134 flw_term: OPN_BRKT expr CLOSE_BRKT .
+
+    $default  reduce using rule 134 (flw_term)
+
+
+State 128
+
+   67 blockstmts: declist stmtlist . CLOSE_CURLY_BRKT
+   78 stmtlist: stmtlist . stmt
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    CLOSE_CURLY_BRKT    shift, and go to state 160
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 92
+    returnstmt       go to state 53
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 129
+
+   68 blockstmts: stmtlist CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 68 (blockstmts)
+
+
+State 130
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ . READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    READ  shift, and go to state 161
+
+
+State 131
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT . filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 162
+
+
+State 132
+
+    5 import_: import_ '\n' IMPORT filename .
+
+    $default  reduce using rule 5 (import_)
+
+
+State 133
+
+   52 fundec: vartype VARIABLE_NAME OPN_BRKT . params CLOSE_BRKT block
+
+    UNSIGNED_INT   shift, and go to state 8
+    UNSIGNED_LONG  shift, and go to state 9
+    INT            shift, and go to state 10
+    BOOL           shift, and go to state 11
+    CHAR           shift, and go to state 12
+    LONG           shift, and go to state 13
+    STRING         shift, and go to state 14
+
+    $default  reduce using rule 60 (paramlist)
+
+    vartype    go to state 163
+    params     go to state 164
+    paramlist  go to state 165
+    arg_type   go to state 166
+
+
+State 134
+
+   35 varinit: VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT
+   36        | VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT
+   37        | VARIABLE_NAME OPN_SQ_BRKT . VARIABLE_NAME CLOSE_SQ_BRKT
+   38        | VARIABLE_NAME OPN_SQ_BRKT . VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   40        | VARIABLE_NAME OPN_SQ_BRKT . UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   41        | VARIABLE_NAME OPN_SQ_BRKT . UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    UNSIGNED_INT_VALUE  shift, and go to state 167
+    VARIABLE_NAME       shift, and go to state 168
+    CLOSE_SQ_BRKT       shift, and go to state 169
+
+
+State 135
+
+   55 return_type: vartype OPN_SQ_BRKT CLOSE_SQ_BRKT .
+   56            | vartype OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 170
+
+    $default  reduce using rule 55 (return_type)
+
+
+State 136
+
+   15 vardeclist: vardeclist COMMA . vardeclist
+
+    VARIABLE_NAME  shift, and go to state 117
+
+    vardeclist  go to state 171
+    varinit     go to state 90
+
+
+State 137
+
+   14 vardec: vartype vardeclist SEMICOLON .
+
+    $default  reduce using rule 14 (vardec)
+
+
+State 138
+
+   17 vardeclist: varinit EQ . array
+   18           | varinit EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    OPN_SQ_BRKT         shift, and go to state 172
+    OPN_CURLY_BRKT      shift, and go to state 173
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    array            go to state 174
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 175
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 139
+
+   53 fundec: return_type VARIABLE_NAME OPN_BRKT . params CLOSE_BRKT block
+
+    UNSIGNED_INT   shift, and go to state 8
+    UNSIGNED_LONG  shift, and go to state 9
+    INT            shift, and go to state 10
+    BOOL           shift, and go to state 11
+    CHAR           shift, and go to state 12
+    LONG           shift, and go to state 13
+    STRING         shift, and go to state 14
+
+    $default  reduce using rule 60 (paramlist)
+
+    vartype    go to state 163
+    params     go to state 176
+    paramlist  go to state 165
+    arg_type   go to state 166
+
+
+State 140
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  106     | expr QUESTION_MARK expr . COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    COLON          shift, and go to state 177
+
+
+State 141
+
+  107 simple_expr: simple_expr OR and_expr .
+  109 and_expr: and_expr . AND not_expr
+
+    AND  shift, and go to state 96
+
+    $default  reduce using rule 107 (simple_expr)
+
+
+State 142
+
+  109 and_expr: and_expr AND not_expr .
+
+    $default  reduce using rule 109 (and_expr)
+
+
+State 143
+
+  113 rel_expr: sum_expr relop sum_expr .
+  121 sum_expr: sum_expr . sumop term
+
+    PLUS   shift, and go to state 102
+    MINUS  shift, and go to state 103
+
+    $default  reduce using rule 113 (rel_expr)
+
+    sumop  go to state 106
+
+
+State 144
+
+  121 sum_expr: sum_expr sumop term .
+  125 term: term . mulop flw_term
+
+    MULTIPLY  shift, and go to state 107
+    DIVIDE    shift, and go to state 108
+    MODULO    shift, and go to state 109
+
+    $default  reduce using rule 121 (sum_expr)
+
+    mulop  go to state 110
+
+
+State 145
+
+  125 term: term mulop flw_term .
+
+    $default  reduce using rule 125 (term)
+
+
+State 146
+
+   94 inc_or_dec_expr: flw_term PLUS_EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 94 (inc_or_dec_expr)
+
+
+State 147
+
+   95 inc_or_dec_expr: flw_term MINUS_EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 95 (inc_or_dec_expr)
+
+
+State 148
+
+   96 inc_or_dec_expr: flw_term MULTIPLY_EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 96 (inc_or_dec_expr)
+
+
+State 149
+
+   97 inc_or_dec_expr: flw_term DIVIDE_EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 97 (inc_or_dec_expr)
+
+
+State 150
+
+   98 inc_or_dec_expr: flw_term MODULO_EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 98 (inc_or_dec_expr)
+
+
+State 151
+
+   93 inc_or_dec_expr: flw_term EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 93 (inc_or_dec_expr)
+
+
+State 152
+
+   90 assign_expr: varinit EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 178
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 153
+
+   91 assign_expr: vartype varinit . EQ expr
+
+    EQ  shift, and go to state 179
+
+
+State 154
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON . expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT assign_expr SEMICOLON . expr SEMICOLON CLOSE_BRKT block
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 180
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 155
+
+   87 loopstmt: WHILE OPN_BRKT expr CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 181
+
+
+State 156
+
+   82 selectstmt: IF OPN_BRKT expr CLOSE_BRKT . block ELSE block
+   83           | IF OPN_BRKT expr CLOSE_BRKT . block else_if
+   84           | IF OPN_BRKT expr CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 182
+
+
+State 157
+
+  139 args: args COMMA . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 183
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 158
+
+  136 after_ID: OPN_BRKT args CLOSE_BRKT .
+
+    $default  reduce using rule 136 (after_ID)
+
+
+State 159
+
+  135 after_ID: OPN_SQ_BRKT expr CLOSE_SQ_BRKT . follow
+
+    OPN_SQ_BRKT  shift, and go to state 184
+
+    $default  reduce using rule 138 (follow)
+
+    follow  go to state 185
+
+
+State 160
+
+   67 blockstmts: declist stmtlist CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 67 (blockstmts)
+
+
+State 161
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ . OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    OPN_BRKT  shift, and go to state 186
+
+
+State 162
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename . CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    CLOSE_BRKT  shift, and go to state 187
+
+
+State 163
+
+   61 arg_type: vartype . VARIABLE_NAME
+   62         | vartype . VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT
+   63         | vartype . VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype . VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    VARIABLE_NAME  shift, and go to state 188
+
+
+State 164
+
+   52 fundec: vartype VARIABLE_NAME OPN_BRKT params . CLOSE_BRKT block
+
+    CLOSE_BRKT  shift, and go to state 189
+
+
+State 165
+
+   57 params: paramlist .
+
+    $default  reduce using rule 57 (params)
+
+
+State 166
+
+   58 paramlist: arg_type . COMMA paramlist
+   59          | arg_type .
+
+    COMMA  shift, and go to state 190
+
+    $default  reduce using rule 59 (paramlist)
+
+
+State 167
+
+   40 varinit: VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE . CLOSE_SQ_BRKT
+   41        | VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE . CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 191
+
+
+State 168
+
+   37 varinit: VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME . CLOSE_SQ_BRKT
+   38        | VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME . CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 192
+
+
+State 169
+
+   35 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT .
+   36        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 193
+
+    $default  reduce using rule 35 (varinit)
+
+
+State 170
+
+   56 return_type: vartype OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 194
+
+
+State 171
+
+   15 vardeclist: vardeclist . COMMA vardeclist
+   15           | vardeclist COMMA vardeclist .
+
+    $default  reduce using rule 15 (vardeclist)
+
+
+State 172
+
+   19 array: OPN_SQ_BRKT . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 195
+
+
+State 173
+
+   20 array: OPN_CURLY_BRKT . element CLOSE_CURLY_BRKT
+   21      | OPN_CURLY_BRKT . OPN_CURLY_BRKT element CLOSE_CURLY_BRKT CLOSE_CURLY_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 196
+    OPN_CURLY_BRKT      shift, and go to state 197
+
+    $default  reduce using rule 26 (element)
+
+    element  go to state 198
+    values   go to state 199
+    boolval  go to state 45
+
+
+State 174
+
+   17 vardeclist: varinit EQ array .
+
+    $default  reduce using rule 17 (vardeclist)
+
+
+State 175
+
+   18 vardeclist: varinit EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 18 (vardeclist)
+
+
+State 176
+
+   53 fundec: return_type VARIABLE_NAME OPN_BRKT params . CLOSE_BRKT block
+
+    CLOSE_BRKT  shift, and go to state 200
+
+
+State 177
+
+  106 expr: expr QUESTION_MARK expr COLON . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 201
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 178
+
+   90 assign_expr: varinit EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 90 (assign_expr)
+
+
+State 179
+
+   91 assign_expr: vartype varinit EQ . expr
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 202
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 180
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr . SEMICOLON inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT assign_expr SEMICOLON expr . SEMICOLON CLOSE_BRKT block
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    SEMICOLON      shift, and go to state 203
+
+
+State 181
+
+   87 loopstmt: WHILE OPN_BRKT expr CLOSE_BRKT block .
+
+    $default  reduce using rule 87 (loopstmt)
+
+
+State 182
+
+   82 selectstmt: IF OPN_BRKT expr CLOSE_BRKT block . ELSE block
+   83           | IF OPN_BRKT expr CLOSE_BRKT block . else_if
+   84           | IF OPN_BRKT expr CLOSE_BRKT block .
+
+    ELSE    shift, and go to state 204
+    ELSEIF  shift, and go to state 205
+
+    $default  reduce using rule 84 (selectstmt)
+
+    else_if  go to state 206
+
+
+State 183
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  139 args: args COMMA expr .
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 139 (args)
+
+
+State 184
+
+  137 follow: OPN_SQ_BRKT . expr CLOSE_SQ_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 207
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 185
+
+  135 after_ID: OPN_SQ_BRKT expr CLOSE_SQ_BRKT follow .
+
+    $default  reduce using rule 135 (after_ID)
+
+
+State 186
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT . filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 208
+
+
+State 187
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT . SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    SEMICOLON  shift, and go to state 209
+
+
+State 188
+
+   61 arg_type: vartype VARIABLE_NAME .
+   62         | vartype VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT
+   63         | vartype VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype VARIABLE_NAME . OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 210
+
+    $default  reduce using rule 61 (arg_type)
+
+
+State 189
+
+   52 fundec: vartype VARIABLE_NAME OPN_BRKT params CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 211
+
+
+State 190
+
+   58 paramlist: arg_type COMMA . paramlist
+
+    UNSIGNED_INT   shift, and go to state 8
+    UNSIGNED_LONG  shift, and go to state 9
+    INT            shift, and go to state 10
+    BOOL           shift, and go to state 11
+    CHAR           shift, and go to state 12
+    LONG           shift, and go to state 13
+    STRING         shift, and go to state 14
+
+    $default  reduce using rule 60 (paramlist)
+
+    vartype    go to state 163
+    paramlist  go to state 212
+    arg_type   go to state 166
+
+
+State 191
+
+   40 varinit: VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT .
+   41        | VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 213
+
+    $default  reduce using rule 40 (varinit)
+
+
+State 192
+
+   37 varinit: VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT .
+   38        | VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 214
+
+    $default  reduce using rule 37 (varinit)
+
+
+State 193
+
+   36 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . CLOSE_SQ_BRKT
+   39        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . VARIABLE_NAME CLOSE_SQ_BRKT
+   42        | VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    UNSIGNED_INT_VALUE  shift, and go to state 215
+    VARIABLE_NAME       shift, and go to state 216
+    CLOSE_SQ_BRKT       shift, and go to state 217
+
+
+State 194
+
+   56 return_type: vartype OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 56 (return_type)
+
+
+State 195
+
+   19 array: OPN_SQ_BRKT CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 19 (array)
+
+
+State 196
+
+   23 element: VARIABLE_NAME .
+
+    $default  reduce using rule 23 (element)
+
+
+State 197
+
+   21 array: OPN_CURLY_BRKT OPN_CURLY_BRKT . element CLOSE_CURLY_BRKT CLOSE_CURLY_BRKT
+   25 element: OPN_CURLY_BRKT . element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 196
+    OPN_CURLY_BRKT      shift, and go to state 218
+
+    $default  reduce using rule 26 (element)
+
+    element  go to state 219
+    values   go to state 199
+    boolval  go to state 45
+
+
+State 198
+
+   20 array: OPN_CURLY_BRKT element . CLOSE_CURLY_BRKT
+   24 element: element . COMMA values
+
+    COMMA             shift, and go to state 220
+    CLOSE_CURLY_BRKT  shift, and go to state 221
+
+
+State 199
+
+   22 element: values .
+
+    $default  reduce using rule 22 (element)
+
+
+State 200
+
+   53 fundec: return_type VARIABLE_NAME OPN_BRKT params CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 222
+
+
+State 201
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  106     | expr QUESTION_MARK expr COLON expr .
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 106 (expr)
+
+
+State 202
+
+   91 assign_expr: vartype varinit EQ expr .
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+
+    $default  reduce using rule 91 (assign_expr)
+
+
+State 203
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON . inc_or_dec_expr CLOSE_BRKT block
+   89         | FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON . CLOSE_BRKT block
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    CLOSE_BRKT          shift, and go to state 223
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 224
+    flw_term         go to state 225
+
+
+State 204
+
+   82 selectstmt: IF OPN_BRKT expr CLOSE_BRKT block ELSE . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 226
+
+
+State 205
+
+   85 else_if: ELSEIF . OPN_BRKT expr CLOSE_BRKT block else_if ELSE block
+   86        | ELSEIF . OPN_BRKT expr CLOSE_BRKT block
+
+    OPN_BRKT  shift, and go to state 227
+
+
+State 206
+
+   83 selectstmt: IF OPN_BRKT expr CLOSE_BRKT block else_if .
+
+    $default  reduce using rule 83 (selectstmt)
+
+
+State 207
+
+  106 expr: expr . QUESTION_MARK expr COLON expr
+  137 follow: OPN_SQ_BRKT expr . CLOSE_SQ_BRKT
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_SQ_BRKT  shift, and go to state 228
+
+
+State 208
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename . CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    CLOSE_BRKT  shift, and go to state 229
+
+
+State 209
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON . stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 52
+    returnstmt       go to state 53
+    stmtlist         go to state 230
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 210
+
+   62 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT
+   63         | vartype VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype VARIABLE_NAME OPN_SQ_BRKT . CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 231
+
+
+State 211
+
+   52 fundec: vartype VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block .
+
+    $default  reduce using rule 52 (fundec)
+
+
+State 212
+
+   58 paramlist: arg_type COMMA paramlist .
+
+    $default  reduce using rule 58 (paramlist)
+
+
+State 213
+
+   41 varinit: VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT . UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    UNSIGNED_INT_VALUE  shift, and go to state 232
+
+
+State 214
+
+   38 varinit: VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT . VARIABLE_NAME CLOSE_SQ_BRKT
+
+    VARIABLE_NAME  shift, and go to state 233
+
+
+State 215
+
+   42 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 234
+
+
+State 216
+
+   39 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 235
+
+
+State 217
+
+   36 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 36 (varinit)
+
+
+State 218
+
+   25 element: OPN_CURLY_BRKT . element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 196
+    OPN_CURLY_BRKT      shift, and go to state 218
+
+    $default  reduce using rule 26 (element)
+
+    element  go to state 236
+    values   go to state 199
+    boolval  go to state 45
+
+
+State 219
+
+   21 array: OPN_CURLY_BRKT OPN_CURLY_BRKT element . CLOSE_CURLY_BRKT CLOSE_CURLY_BRKT
+   24 element: element . COMMA values
+   25        | OPN_CURLY_BRKT element . CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    COMMA             shift, and go to state 220
+    CLOSE_CURLY_BRKT  shift, and go to state 237
+
+
+State 220
+
+   24 element: element COMMA . values
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+
+    values   go to state 238
+    boolval  go to state 45
+
+
+State 221
+
+   20 array: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 20 (array)
+
+
+State 222
+
+   53 fundec: return_type VARIABLE_NAME OPN_BRKT params CLOSE_BRKT block .
+
+    $default  reduce using rule 53 (fundec)
+
+
+State 223
+
+   89 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 239
+
+
+State 224
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr . CLOSE_BRKT block
+
+    CLOSE_BRKT  shift, and go to state 240
+
+
+State 225
+
+   93 inc_or_dec_expr: flw_term . EQ expr
+   94                | flw_term . PLUS_EQ expr
+   95                | flw_term . MINUS_EQ expr
+   96                | flw_term . MULTIPLY_EQ expr
+   97                | flw_term . DIVIDE_EQ expr
+   98                | flw_term . MODULO_EQ expr
+
+    PLUS_EQ      shift, and go to state 111
+    MINUS_EQ     shift, and go to state 112
+    MULTIPLY_EQ  shift, and go to state 113
+    DIVIDE_EQ    shift, and go to state 114
+    MODULO_EQ    shift, and go to state 115
+    EQ           shift, and go to state 116
+
+
+State 226
+
+   82 selectstmt: IF OPN_BRKT expr CLOSE_BRKT block ELSE block .
+
+    $default  reduce using rule 82 (selectstmt)
+
+
+State 227
+
+   85 else_if: ELSEIF OPN_BRKT . expr CLOSE_BRKT block else_if ELSE block
+   86        | ELSEIF OPN_BRKT . expr CLOSE_BRKT block
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    inc_or_dec_expr  go to state 58
+    expr             go to state 241
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 228
+
+  137 follow: OPN_SQ_BRKT expr CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 137 (follow)
+
+
+State 229
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT . SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    SEMICOLON  shift, and go to state 242
+
+
+State 230
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist . CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+   78 stmtlist: stmtlist . stmt
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CLOSE               shift, and go to state 243
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 92
+    returnstmt       go to state 53
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 231
+
+   62 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT .
+   63         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT . OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    OPN_SQ_BRKT  shift, and go to state 244
+
+    $default  reduce using rule 62 (arg_type)
+
+
+State 232
+
+   41 varinit: VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 245
+
+
+State 233
+
+   38 varinit: VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 246
+
+
+State 234
+
+   42 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 42 (varinit)
+
+
+State 235
+
+   39 varinit: VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 39 (varinit)
+
+
+State 236
+
+   24 element: element . COMMA values
+   25        | OPN_CURLY_BRKT element . CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    COMMA             shift, and go to state 220
+    CLOSE_CURLY_BRKT  shift, and go to state 247
+
+
+State 237
+
+   21 array: OPN_CURLY_BRKT OPN_CURLY_BRKT element CLOSE_CURLY_BRKT . CLOSE_CURLY_BRKT
+   25 element: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT . COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    COMMA             shift, and go to state 248
+    CLOSE_CURLY_BRKT  shift, and go to state 249
+
+
+State 238
+
+   24 element: element COMMA values .
+
+    $default  reduce using rule 24 (element)
+
+
+State 239
+
+   89 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON CLOSE_BRKT block .
+
+    $default  reduce using rule 89 (loopstmt)
+
+
+State 240
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 250
+
+
+State 241
+
+   85 else_if: ELSEIF OPN_BRKT expr . CLOSE_BRKT block else_if ELSE block
+   86        | ELSEIF OPN_BRKT expr . CLOSE_BRKT block
+  106 expr: expr . QUESTION_MARK expr COLON expr
+
+    QUESTION_MARK  shift, and go to state 93
+    CLOSE_BRKT     shift, and go to state 251
+
+
+State 242
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON . stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 52
+    returnstmt       go to state 53
+    stmtlist         go to state 252
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 243
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE . OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    OPN_BRKT  shift, and go to state 253
+
+
+State 244
+
+   63 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . VARIABLE_NAME CLOSE_SQ_BRKT
+   64         | vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT . UNSIGNED_INT_VALUE CLOSE_SQ_BRKT
+
+    UNSIGNED_INT_VALUE  shift, and go to state 254
+    VARIABLE_NAME       shift, and go to state 255
+
+
+State 245
+
+   41 varinit: VARIABLE_NAME OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 41 (varinit)
+
+
+State 246
+
+   38 varinit: VARIABLE_NAME OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 38 (varinit)
+
+
+State 247
+
+   25 element: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT . COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    COMMA  shift, and go to state 248
+
+
+State 248
+
+   25 element: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT COMMA . OPN_CURLY_BRKT element CLOSE_CURLY_BRKT
+
+    OPN_CURLY_BRKT  shift, and go to state 256
+
+
+State 249
+
+   21 array: OPN_CURLY_BRKT OPN_CURLY_BRKT element CLOSE_CURLY_BRKT CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 21 (array)
+
+
+State 250
+
+   88 loopstmt: FOR OPN_BRKT assign_expr SEMICOLON expr SEMICOLON inc_or_dec_expr CLOSE_BRKT block .
+
+    $default  reduce using rule 88 (loopstmt)
+
+
+State 251
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT . block else_if ELSE block
+   86        | ELSEIF OPN_BRKT expr CLOSE_BRKT . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 257
+
+
+State 252
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist . CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON
+   78 stmtlist: stmtlist . stmt
+
+    RETURN              shift, and go to state 15
+    BREAK               shift, and go to state 16
+    CLOSE               shift, and go to state 258
+    CONTINUE            shift, and go to state 17
+    FOR                 shift, and go to state 18
+    WHILE               shift, and go to state 19
+    IF                  shift, and go to state 20
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 28
+    OPN_BRKT            shift, and go to state 29
+    SEMICOLON           shift, and go to state 31
+    FILEREAD            shift, and go to state 32
+    FILEWRITE           shift, and go to state 33
+    PREINC              shift, and go to state 34
+    POSTINC             shift, and go to state 35
+    PREDEC              shift, and go to state 36
+    POSTDEC             shift, and go to state 37
+    NOT                 shift, and go to state 38
+
+    values           go to state 44
+    boolval          go to state 45
+    file_operation   go to state 47
+    continuestmt     go to state 51
+    stmt             go to state 92
+    returnstmt       go to state 53
+    exprstmt         go to state 55
+    selectstmt       go to state 56
+    loopstmt         go to state 57
+    inc_or_dec_expr  go to state 58
+    breakstmt        go to state 59
+    expr             go to state 60
+    simple_expr      go to state 61
+    and_expr         go to state 62
+    not_expr         go to state 63
+    rel_expr         go to state 64
+    sum_expr         go to state 65
+    term             go to state 66
+    flw_term         go to state 67
+
+
+State 253
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT . filename CLOSE_BRKT SEMICOLON
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 259
+
+
+State 254
+
+   64 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 260
+
+
+State 255
+
+   63 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME . CLOSE_SQ_BRKT
+
+    CLOSE_SQ_BRKT  shift, and go to state 261
+
+
+State 256
+
+   25 element: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT . element CLOSE_CURLY_BRKT
+
+    TRUE                shift, and go to state 22
+    FALSE               shift, and go to state 23
+    UNSIGNED_INT_VALUE  shift, and go to state 24
+    SIGNED_INT_VALUE    shift, and go to state 25
+    CHAR_VALUE          shift, and go to state 26
+    STRING_VALUE        shift, and go to state 27
+    VARIABLE_NAME       shift, and go to state 196
+    OPN_CURLY_BRKT      shift, and go to state 218
+
+    $default  reduce using rule 26 (element)
+
+    element  go to state 262
+    values   go to state 199
+    boolval  go to state 45
+
+
+State 257
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT block . else_if ELSE block
+   86        | ELSEIF OPN_BRKT expr CLOSE_BRKT block .
+
+    ELSEIF  shift, and go to state 205
+
+    $default  reduce using rule 86 (else_if)
+
+    else_if  go to state 263
+
+
+State 258
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE . OPN_BRKT filename CLOSE_BRKT SEMICOLON
+
+    OPN_BRKT  shift, and go to state 264
+
+
+State 259
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename . CLOSE_BRKT SEMICOLON
+
+    CLOSE_BRKT  shift, and go to state 265
+
+
+State 260
+
+   64 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT UNSIGNED_INT_VALUE CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 64 (arg_type)
+
+
+State 261
+
+   63 arg_type: vartype VARIABLE_NAME OPN_SQ_BRKT CLOSE_SQ_BRKT OPN_SQ_BRKT VARIABLE_NAME CLOSE_SQ_BRKT .
+
+    $default  reduce using rule 63 (arg_type)
+
+
+State 262
+
+   24 element: element . COMMA values
+   25        | OPN_CURLY_BRKT element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element . CLOSE_CURLY_BRKT
+
+    COMMA             shift, and go to state 220
+    CLOSE_CURLY_BRKT  shift, and go to state 266
+
+
+State 263
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT block else_if . ELSE block
+
+    ELSE  shift, and go to state 267
+
+
+State 264
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT . filename CLOSE_BRKT SEMICOLON
+
+    STRING_VALUE   shift, and go to state 4
+    VARIABLE_NAME  shift, and go to state 5
+
+    filename  go to state 268
+
+
+State 265
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT . SEMICOLON
+
+    SEMICOLON  shift, and go to state 269
+
+
+State 266
+
+   25 element: OPN_CURLY_BRKT element CLOSE_CURLY_BRKT COMMA OPN_CURLY_BRKT element CLOSE_CURLY_BRKT .
+
+    $default  reduce using rule 25 (element)
+
+
+State 267
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT block else_if ELSE . block
+
+    OPN_CURLY_BRKT  shift, and go to state 30
+
+    block  go to state 270
+
+
+State 268
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename . CLOSE_BRKT SEMICOLON
+
+    CLOSE_BRKT  shift, and go to state 271
+
+
+State 269
+
+   51 file_operation: FILEWRITE WRITE OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON .
+
+    $default  reduce using rule 51 (file_operation)
+
+
+State 270
+
+   85 else_if: ELSEIF OPN_BRKT expr CLOSE_BRKT block else_if ELSE block .
+
+    $default  reduce using rule 85 (else_if)
+
+
+State 271
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT . SEMICOLON
+
+    SEMICOLON  shift, and go to state 272
+
+
+State 272
+
+   50 file_operation: FILEREAD VARIABLE_NAME EQ READ OPN_BRKT filename CLOSE_BRKT SEMICOLON stmtlist CLOSE OPN_BRKT filename CLOSE_BRKT SEMICOLON .
+
+    $default  reduce using rule 50 (file_operation)

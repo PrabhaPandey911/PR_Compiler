@@ -1,0 +1,31 @@
+void combination(int a[],int n,int cur[],int index)
+{
+	int i=0;
+	if(index==n)
+	{
+		return;
+	}
+	while(cur[i]!=0)
+	{
+		print(cur[i]);
+		i+=1;
+	}
+	for(int k=index+1;k<n;k++)
+	{
+		cur[k] = a[k];
+		combination(a,n,cur,k);
+		cur[k]=0;
+	}
+	return;
+}
+int main()
+{
+	int n = input();
+	int a[n]={0};
+	int cur[n]={0};
+	for(int i=0;i<n;i++)
+	{
+		a[i]=i+1;
+	}
+	combination(a,n,cur,U-1);
+}

@@ -1,0 +1,28 @@
+int main()
+{
+	unsigned_long array[100000000];
+	int count=0;
+	for(int i=0;i<100000000;i++)
+	{
+		array[i]=i+1;
+	}
+	for(int i=0;i<100000000;i++)
+	{
+		array[i]=array[i]*array[i];
+	}
+	
+	for (int i = 100000000 - 1; i >= 2; i--)
+	{
+		int l = 0;
+		int r = i - 1;
+		while (l < r)
+		{
+			if (array[l] + array[r] == array[i])
+			{ 
+				count+=1;
+			}
+			(array[l] + array[r] < array[i]) ? l++ : r--;			
+		}
+	}
+	print( count);
+}

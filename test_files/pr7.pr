@@ -1,0 +1,64 @@
+int N = 5;
+int arr[N] = {11,4,28,27,116};
+int getmax(int arr[],int N)
+{
+	int max=arr[0];
+	int i;
+	for(i=1 ; i<N ; i++)
+	{
+		if(max < a[i])
+		{
+			max = a[i];
+		}
+	}
+	return max;
+}
+int[] countsort(int arr[ ],int N,int divisor)
+{
+	int temp[N];
+	int i,indx,count[10];
+	for( i=0 ; i<10 ; i++ )
+	{
+		count [0] = 0;
+	}
+	for( i=0 ; i<N ; i++ )
+	{
+		indx = (arr[i]/divisor) % 10;
+		count[indx]+=1;
+	}
+	for( i=1 ; i<10 ; i++ )
+	{
+		count[i] += count[i-1];
+	}
+	for( i=N-1 ; i>=0 ; i-- )
+	{
+		indx = (arr[i]/divisor) % 10;
+		temp[count[indx]-1] = arr[i];
+		count[indx]-=1;
+	}
+	for( i=0 ; i<N ; i++ )
+	{
+		arr[i] = output[i];
+	}
+	return arr;
+}
+int[] radixsort(int arr[ ],int N)
+{
+	int maxno = getmax(arr,N);
+	int divisor = 1;
+	for ( divisor = 1 ; maxno/divisor > 0 ; divisor *= 10 )
+	{
+		arr = countsort ( arr , N , divisor );
+	}
+	return arr;
+}
+int main()
+{
+	int brr[N];
+	brr=radixsort(arr,N);
+	for(int i=0;i<N;i++)
+	{
+		print(brr[i]);	
+	}
+}
+

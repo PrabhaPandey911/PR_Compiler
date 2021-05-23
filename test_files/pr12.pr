@@ -1,0 +1,51 @@
+int search ( char word[] , char list[][n] )
+{
+	int pos = 0;
+	int length = length(list);
+	while ( pos < length && list[pos] !=word)
+	{
+		pos++;
+	}
+	if(pos == length)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+	return 0;
+}
+int main()
+{
+	int i,j=0;
+	char list[ ][10];
+	char  word[10]="";
+	int length = j;
+	string filepath = "C:/Documents/Sample.txt";
+	int len=0;
+	fileRead text = read(filepath);
+	len = length(text);
+	close(filepath);
+
+	for( i=0 ; i<len ; )
+	{
+		int res=0; 
+		word = "";
+		while( text[i] != "" && i<len)
+		{
+			word += text[i];
+			i++;
+		}
+		res = search ( word , list);
+		if(res == 0)
+		{
+			list[j++] = word;
+		}
+	}
+	
+	for( i=0 ; i<length ; i++)
+	{
+		print(list[i]);
+	}
+}

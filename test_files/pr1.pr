@@ -1,0 +1,16 @@
+int main()
+{
+	int k = input();
+	int N = input();
+	int sum=0;
+	for(int i=1;i<=N;i++)
+	{
+		int add=i;
+		for(int j=0;j<k;j++)
+		{
+			add*=add;
+		}
+		sum+=add;
+	}
+	print(sum);	
+}
